@@ -1,0 +1,19 @@
+{
+  "name": "qa-api-tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "newman run /Users/k.voitsyk/pet-project/postman-api-tests/config/user-setup.postman_collection.json -e /Users/k.voitsyk/pet-project/postman-api-tests/config/users-contacts-api.postman_environment.json -r cli,allure --reporter-allure-export ./allure-results"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "newman-reporter-allure": "^3.6.0",
+    "newman-reporter-htmlextra": "^1.23.1"
+  },
+  "dependencies": {
+    "newman": "^6.2.2"
+  }
+}

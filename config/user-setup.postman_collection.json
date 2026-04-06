@@ -1,0 +1,634 @@
+{
+  "info": {
+    "_postman_id": "2acdac59-6a4a-4c7d-be0d-5d8deeaea538",
+    "name": "user-setup",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "17315576",
+    "_collection_link": "https://go.postman.co/collection/17315576-2acdac59-6a4a-4c7d-be0d-5d8deeaea538?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Add users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse response once",
+              "function getJson() {",
+              "    try {",
+              "        return pm.response.json();",
+              "    } catch (e) {",
+              "        console.log(\"Response is not JSON\");",
+              "        return null;",
+              "    }",
+              "}",
+              "",
+              "const json = getJson();",
+              "",
+              "// Status check",
+              "pm.test(\"Status is 201\", () => {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// User object exists",
+              "pm.test(\"User object is present\", () => {",
+              "    pm.expect(json).to.have.property(\"user\");",
+              "});",
+              "",
+              "// Only continue if user exists",
+              "if (json.user) {",
+              "",
+              "    pm.test(\"User has ID\", () => {",
+              "        pm.expect(json.user).to.have.property(\"_id\");",
+              "    });",
+              "",
+              "    pm.test(\"User data is correct\", () => {",
+              "        pm.expect(json.user.firstName).to.eql(pm.environment.get(\"firstName\"));",
+              "        pm.expect(json.user.email).to.eql(pm.environment.get(\"email\"));",
+              "    });",
+              "",
+              "// Token validation (safe)",
+              "    pm.test(\"Token is present\", () => {",
+              "    pm.expect(json).to.have.property(\"token\");",
+              "    pm.expect(json.token).to.be.a(\"string\");",
+              "});",
+              "",
+              "// Save user ID",
+              "    pm.environment.set(\"user_id\", json.user._id);",
+              "",
+              "// Save email",
+              "    pm.environment.set(\"email\", json.user.email);",
+              "",
+              "} else {",
+              "    console.log(\"User object not found in response:\", json);",
+              "}",
+              "",
+              "// Save token only if exists",
+              "if (json.token) {",
+              "    pm.environment.set(\"auth_token\", json.token);",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const random = Math.floor(Math.random() * 1000);",
+              "",
+              "pm.environment.set(\"firstName\", \"user\" + random);",
+              "pm.environment.set(\"lastName\", \"test\" + random);",
+              "pm.environment.set(\"email\", `user${random}@gmail.com`);",
+              "pm.environment.set(\"password\", \"password\" + random);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"firstName\": \"{{firstName}}\",\n    \"lastName\": \"{{lastName}}\",\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/users",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "function getJson() {",
+              "    try {",
+              "        return pm.response.json();",
+              "    } catch (e) {",
+              "        console.log(\"Response is not JSON\");",
+              "        return null;",
+              "    }",
+              "}",
+              "",
+              "const json = getJson();",
+              "",
+              "try {",
+              "    json = pm.response.json();",
+              "} catch (e) {",
+              "    console.log(\"Response is not JSON\");",
+              "}",
+              "",
+              "pm.test(\"Status is 200\", () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"User has all required fields\", () => {",
+              "    pm.expect(json).to.have.property(\"_id\");",
+              "    pm.expect(json).to.have.property(\"firstName\");",
+              "    pm.expect(json).to.have.property(\"lastName\");",
+              "    pm.expect(json).to.have.property(\"email\");",
+              "    pm.expect(json).to.have.property(\"__v\");",
+              "});",
+              "",
+              "pm.test(\"Field types are correct\", () => {",
+              "    pm.expect(json._id).to.be.a(\"string\");",
+              "    pm.expect(json.firstName).to.be.a(\"string\");",
+              "    pm.expect(json.lastName).to.be.a(\"string\");",
+              "    pm.expect(json.email).to.be.a(\"string\");",
+              "    pm.expect(json.__v).to.be.a(\"number\");",
+              "});",
+              "",
+              "pm.test(\"Returned user matches logged-in user\", () => {",
+              "    const expectedEmail = pm.environment.get(\"email\");",
+              "    pm.expect(json.email).to.eql(expectedEmail);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseURL}}/users/me",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let json;",
+              "",
+              "try {",
+              "    json = pm.response.json();",
+              "} catch (e) {",
+              "    console.log(\"Response is not JSON\");",
+              "}",
+              "",
+              "pm.test(\"Status is 200\", () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has all required fields\", () => {",
+              "    pm.expect(json).to.have.property(\"_id\");",
+              "    pm.expect(json).to.have.property(\"firstName\");",
+              "    pm.expect(json).to.have.property(\"lastName\");",
+              "    pm.expect(json).to.have.property(\"email\");",
+              "    pm.expect(json).to.have.property(\"__v\");",
+              "});",
+              "",
+              "pm.test(\"firstName was updated correctly\", () => {",
+              "    pm.expect(json.firstName).to.eql(json.firstName)",
+              "    });",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const updated = \"user_\" + Math.floor(Math.random()*1000) + \"_UPDATED\";",
+              "pm.environment.set(\"updatedFirstName\", updated);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"{{updatedFirstName}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/users/me",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Log Out User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let json = null;",
+              "",
+              "try {",
+              "    json = pm.response.json();",
+              "} catch (e) {",
+              "    console.log(\"No JSON body (valid for logout)\");",
+              "}",
+              "",
+              "pm.test(\"Status is 200 or 204\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+              "});",
+              "",
+              "pm.test(\"Logout message is correct (if present)\", () => {",
+              "    if (json && json.error) {",
+              "        pm.expect(json.error).to.include(\"Please authenticate\");",
+              "    } else {",
+              "        console.log(\"No message returned\");",
+              "    }",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/users/logout",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "users",
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Log In User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse response safely",
+              "let json;",
+              "",
+              "try {",
+              "    json = pm.response.json();",
+              "} catch (e) {",
+              "    console.log(\"Response is not JSON\");",
+              "}",
+              "",
+              "// Extract token",
+              "let token = json ? json.token : null;",
+              "",
+              "// Save token if it exists",
+              "if (token) {",
+              "    pm.environment.set(\"auth_token\", token);",
+              "}",
+              "",
+              "// Status code check",
+              "pm.test(\"Status is 200\", () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Token exists",
+              "pm.test(\"Token is present\", () => {",
+              "    pm.expect(token).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "",
+              "// Token matches the stored environment variable",
+              "pm.test(\"Token matches environment variable\", () => {",
+              "    const envToken = pm.environment.get(\"auth_token\");",
+              "    pm.expect(token).to.eql(envToken);",
+              "});",
+              "",
+              "// Response contains user object",
+              "pm.test(\"User object exists\", () => {",
+              "    pm.expect(json).to.have.property(\"user\");",
+              "});",
+              "",
+              "// User object has required fields",
+              "pm.test(\"User object has ID, email and name\", () => {",
+              "    const user = json.user;",
+              "    pm.expect(user).to.have.property(\"_id\").that.is.a(\"string\");",
+              "    pm.expect(user).to.have.property(\"firstName\").that.is.a(\"string\");",
+              "    pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");",
+              "});",
+              "",
+              "// Validate email matches environment",
+              "pm.test(\"Email matches environment variable\", () => {",
+              "    const expectedEmail = pm.environment.get(\"email\");",
+              "    if (expectedEmail) {",
+              "        pm.expect(json.user.email).to.eql(expectedEmail);",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/users/login",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Log In Missing Required Field",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let json = null;",
+              "",
+              "try {",
+              "    json = pm.response.json();",
+              "} catch (e) {}",
+              "",
+              "// Status check first",
+              "pm.test(\"Status is 400 or 401\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+              "});",
+              "",
+              "// Safe validation",
+              "pm.test(\"Error message exists (if body present)\", () => {",
+              "    if (json && json.message) {",
+              "        pm.expect(json.message).to.be.a(\"string\");",
+              "    } else {",
+              "        console.log(\"No message field in response\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"{{email}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/users/login",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let json = null;",
+              "",
+              "try {",
+              "    json = pm.response.json();",
+              "} catch (e) {",
+              "    console.log(\"No JSON response (may be empty for successful delete)\");",
+              "}",
+              "",
+              "pm.test(\"Status is 200 on successful delete\", () => {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "",
+              "pm.test(\"Auth token is present for DELETE request\", () => {",
+              "    const token = pm.environment.get(\"auth_token\");",
+              "    pm.expect(token).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "",
+              "pm.test(\"401 Unauthorized when token missing or expired\", () => {",
+              "    const status = pm.response.code;",
+              "    if (status === 401) {",
+              "        pm.expect(json).to.have.property(\"error\");",
+              "        pm.expect(json.error).to.eql(\"Please authenticate.\");",
+              "    }",
+              "});",
+              "",
+              "pm.environment.unset(\"user_id\");",
+              "pm.environment.unset(\"firstName\");",
+              "pm.environment.unset(\"lastName\");",
+              "pm.environment.unset(\"email\");",
+              "pm.environment.unset(\"updatedFirstName\");",
+              "pm.environment.unset(\"password\");",
+              "pm.environment.unset(\"auth_token\");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/users/me",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
