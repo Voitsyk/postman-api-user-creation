@@ -10,7 +10,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "newman-reporter-allure": "^3.6.0",
+    "newman-reporter-allure": "^3.7.1",
     "newman-reporter-htmlextra": "^1.23.1"
   },
   "dependencies": {
