@@ -1,0 +1,53 @@
+// Parse response safely
+let json;
+
+try {
+    json = pm.response.json();
+} catch (e) {
+    console.log("Response is not JSON");
+}
+
+// Extract token
+let token = json ? json.token : null;
+
+// Save token if it exists
+if (token) {
+    pm.environment.set("auth_token", token);
+}
+
+// Status code check
+pm.test("Status is 200", () => {
+    pm.response.to.have.status(200);
+});
+
+// Token exists
+pm.test("Token is present", () => {
+    pm.expect(token).to.be.a("string").and.not.empty;
+});
+
+// Token matches the stored environment variable
+pm.test("Token matches environment variable", () => {
+    const envToken = pm.environment.get("auth_token");
+    pm.expect(token).to.eql(envToken);
+});
+
+// Response contains user object
+pm.test("User object exists", () => {
+    pm.expect(json).to.have.property("user");
+});
+
+// User object has required fields
+pm.test("User object has ID, email and name", () => {
+    const user = json.user;
+    pm.expect(user).to.have.property("_id").that.is.a("string");
+    pm.expect(user).to.have.property("firstName").that.is.a("string");
+    pm.expect(user).to.have.property("email").that.is.a("string");
+});
+
+// Validate email matches environment
+pm.test("Email matches environment variable", () => {
+    const expectedEmail = pm.environment.get("email");
+    if (expectedEmail) {
+        pm.expect(json.user.email).to.eql(expectedEmail);
+    }
+});

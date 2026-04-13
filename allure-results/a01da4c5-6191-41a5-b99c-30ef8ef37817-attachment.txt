@@ -1,0 +1,1 @@
+{"user":{"_id":"69dd2073a2dfe50015d5247a","firstName":"user372","lastName":"test372","email":"user372@gmail.com","__v":1},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWRkMjA3M2EyZGZlNTAwMTVkNTI0N2EiLCJpYXQiOjE3NzYwOTk0NDN9.xIh5JtHjjo-Y0oqx1n7dGPbicKH3rudPS9sjWd4QvyE"}

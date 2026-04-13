@@ -1,0 +1,6 @@
+const random = Math.floor(Math.random() * 1000);
+
+pm.environment.set("firstName", "user" + random);
+pm.environment.set("lastName", "test" + random);
+pm.environment.set("email", `user${random}@gmail.com`);
+pm.environment.set("password", "password" + random);

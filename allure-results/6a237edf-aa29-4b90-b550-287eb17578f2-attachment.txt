@@ -1,0 +1,32 @@
+let json = null;
+
+try {
+    json = pm.response.json();
+} catch (e) {
+    console.log("No JSON response (may be empty for successful delete)");
+}
+
+pm.test("Status is 200 on successful delete", () => {
+    pm.expect(pm.response.code).to.equal(200);
+});
+
+pm.test("Auth token is present for DELETE request", () => {
+    const token = pm.environment.get("auth_token");
+    pm.expect(token).to.be.a("string").and.not.empty;
+});
+
+pm.test("401 Unauthorized when token missing or expired", () => {
+    const status = pm.response.code;
+    if (status === 401) {
+        pm.expect(json).to.have.property("error");
+        pm.expect(json.error).to.eql("Please authenticate.");
+    }
+});
+
+pm.environment.unset("user_id");
+pm.environment.unset("firstName");
+pm.environment.unset("lastName");
+pm.environment.unset("email");
+pm.environment.unset("updatedFirstName");
+pm.environment.unset("password");
+pm.environment.unset("auth_token");

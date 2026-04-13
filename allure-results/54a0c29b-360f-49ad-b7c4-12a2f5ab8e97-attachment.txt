@@ -1,0 +1,2 @@
+level: log, messages: No JSON body (valid for logout)
+level: log, messages: No message returned

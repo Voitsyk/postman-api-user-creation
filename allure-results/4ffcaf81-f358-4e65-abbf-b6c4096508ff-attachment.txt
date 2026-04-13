@@ -1,0 +1,19 @@
+let json = null;
+
+try {
+    json = pm.response.json();
+} catch (e) {}
+
+// Status check first
+pm.test("Status is 400 or 401", () => {
+    pm.expect(pm.response.code).to.be.oneOf([400, 401]);
+});
+
+// Safe validation
+pm.test("Error message exists (if body present)", () => {
+    if (json && json.message) {
+        pm.expect(json.message).to.be.a("string");
+    } else {
+        console.log("No message field in response");
+    }
+});

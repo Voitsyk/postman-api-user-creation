@@ -1,0 +1,54 @@
+// Parse response once
+function getJson() {
+    try {
+        return pm.response.json();
+    } catch (e) {
+        console.log("Response is not JSON");
+        return null;
+    }
+}
+
+const json = getJson();
+
+// Status check
+pm.test("Status is 201", () => {
+    pm.response.to.have.status(201);
+});
+
+// User object exists
+pm.test("User object is present", () => {
+    pm.expect(json).to.have.property("user");
+});
+
+// Only continue if user exists
+if (json.user) {
+
+    pm.test("User has ID", () => {
+        pm.expect(json.user).to.have.property("_id");
+    });
+
+    pm.test("User data is correct", () => {
+        pm.expect(json.user.firstName).to.eql(pm.environment.get("firstName"));
+        pm.expect(json.user.email).to.eql(pm.environment.get("email"));
+    });
+
+// Token validation (safe)
+    pm.test("Token is present", () => {
+    pm.expect(json).to.have.property("token");
+    pm.expect(json.token).to.be.a("string");
+});
+
+// Save user ID
+    pm.environment.set("user_id", json.user._id);
+
+// Save email
+    pm.environment.set("email", json.user.email);
+
+} else {
+    console.log("User object not found in response:", json);
+}
+
+// Save token only if exists
+if (json.token) {
+    pm.environment.set("auth_token", json.token);
+}

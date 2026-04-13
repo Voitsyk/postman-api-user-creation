@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "newman run /Users/k.voitsyk/pet-project/postman-api-tests/config/user-setup.postman_collection.json -e /Users/k.voitsyk/pet-project/postman-api-tests/config/users-contacts-api.postman_environment.json -r cli,allure --reporter-allure-export ./allure-results"
+    "test": "rm -rf ./allure-results && newman run /Users/k.voitsyk/pet-project/postman-api-tests/config/user-setup.postman_collection.json -e /Users/k.voitsyk/pet-project/postman-api-tests/config/users-contacts-api.postman_environment.json -r cli,allure --reporter-allure-export ./allure-results"
   },
   "keywords": [],
   "author": "",

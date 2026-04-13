@@ -1,0 +1,19 @@
+let json = null;
+
+try {
+    json = pm.response.json();
+} catch (e) {
+    console.log("No JSON body (valid for logout)");
+}
+
+pm.test("Status is 200 or 204", () => {
+    pm.expect(pm.response.code).to.be.oneOf([200, 204]);
+});
+
+pm.test("Logout message is correct (if present)", () => {
+    if (json && json.error) {
+        pm.expect(json.error).to.include("Please authenticate");
+    } else {
+        console.log("No message returned");
+    }
+});

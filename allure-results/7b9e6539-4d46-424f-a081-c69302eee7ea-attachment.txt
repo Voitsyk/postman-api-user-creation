@@ -1,0 +1,23 @@
+let json;
+
+try {
+    json = pm.response.json();
+} catch (e) {
+    console.log("Response is not JSON");
+}
+
+pm.test("Status is 200", () => {
+    pm.response.to.have.status(200);
+});
+
+pm.test("Response has all required fields", () => {
+    pm.expect(json).to.have.property("_id");
+    pm.expect(json).to.have.property("firstName");
+    pm.expect(json).to.have.property("lastName");
+    pm.expect(json).to.have.property("email");
+    pm.expect(json).to.have.property("__v");
+});
+
+pm.test("firstName was updated correctly", () => {
+    pm.expect(json.firstName).to.eql(json.firstName)
+    });

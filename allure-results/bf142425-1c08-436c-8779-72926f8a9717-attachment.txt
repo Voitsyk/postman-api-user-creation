@@ -1,0 +1,41 @@
+function getJson() {
+    try {
+        return pm.response.json();
+    } catch (e) {
+        console.log("Response is not JSON");
+        return null;
+    }
+}
+
+const json = getJson();
+
+try {
+    json = pm.response.json();
+} catch (e) {
+    console.log("Response is not JSON");
+}
+
+pm.test("Status is 200", () => {
+    pm.response.to.have.status(200);
+});
+
+pm.test("User has all required fields", () => {
+    pm.expect(json).to.have.property("_id");
+    pm.expect(json).to.have.property("firstName");
+    pm.expect(json).to.have.property("lastName");
+    pm.expect(json).to.have.property("email");
+    pm.expect(json).to.have.property("__v");
+});
+
+pm.test("Field types are correct", () => {
+    pm.expect(json._id).to.be.a("string");
+    pm.expect(json.firstName).to.be.a("string");
+    pm.expect(json.lastName).to.be.a("string");
+    pm.expect(json.email).to.be.a("string");
+    pm.expect(json.__v).to.be.a("number");
+});
+
+pm.test("Returned user matches logged-in user", () => {
+    const expectedEmail = pm.environment.get("email");
+    pm.expect(json.email).to.eql(expectedEmail);
+});

@@ -1,0 +1,2 @@
+const updated = "user_" + Math.floor(Math.random()*1000) + "_UPDATED";
+pm.environment.set("updatedFirstName", updated);

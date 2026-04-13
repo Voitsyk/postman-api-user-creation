@@ -1,0 +1,11 @@
+{
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWRkMjA3M2EyZGZlNTAwMTVkNTI0N2EiLCJpYXQiOjE3NzYwOTk0NDR9.LdehsH3vDtIynyRyxmyL8T5Lvyzwnry-5daH3sL-ci8",
+    "User-Agent": "PostmanRuntime/7.39.1",
+    "Accept": "*/*",
+    "Cache-Control": "no-cache",
+    "Postman-Token": "703d958b-d8d9-405e-ae93-4e69ba8dde9d",
+    "Host": "thinking-tester-contact-list.herokuapp.com",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Cookie": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWRkMjA3M2EyZGZlNTAwMTVkNTI0N2EiLCJpYXQiOjE3NzYwOTk0NDR9.LdehsH3vDtIynyRyxmyL8T5Lvyzwnry-5daH3sL-ci8"
+}
